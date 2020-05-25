@@ -162,13 +162,10 @@ def solve_it(input_data):
 
     now = datetime.now()
 
-    # let's try to implement greedy algorithm first
-
-    # get ordered list of items
     output_data = solve_it_dp(input_data)
     later = datetime.now()
     difference = (later - now).total_seconds()
-
+    print('time taken:', difference)
     return output_data
 
 def naive(input_data):
