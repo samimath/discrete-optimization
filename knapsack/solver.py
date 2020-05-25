@@ -226,5 +226,4 @@ if __name__ == '__main__':
             input_data = input_data_file.read()
         print(solve_it(input_data))
     else:
-        print(
-            'This test requires an input file.  Please select one from the data directory. (i.e. python solver.py ./data/ks_4_0)')
+        print('This test requires an input file.  Please select one from the data directory. (i.e. python solver.py ./data/ks_4_0)')
