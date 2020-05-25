@@ -28,7 +28,7 @@ def get_weight_density(input_data):
         parts = line.split()
         items.append(Item2(i - 1, int(parts[0]), int(parts[1]), float(parts[0]) / float(parts[1])))
     # returns list of attributes ordered by value density in descending order
-    return capacity, sorted(items, key=attrgetter('value_density'), reverse=True)
+    return sorted(items, key=attrgetter('value_density'), reverse=True),capacity
 
 
 def memoization_1d(items, cap):
@@ -99,9 +99,9 @@ def flatten(iterable):
     return results
 
 
-def solve_dp(input_data):
-    cap, items = get_weight_density(input_data)
-    D = memoization_1d(items, cap)
+def solve_dp(items,capacity):
+    #cap, items = get_weight_density(input_data)
+    D = memoization_1d(items, capacity)
     #print(D)
     #print(D[-1, -1])
     opt_val = D[-1, -1]
@@ -115,11 +115,13 @@ def solve_dp(input_data):
     return opt_val, [x for x in selected if x is not None]
 
 
-def solve_it_greedy(input_data):
+def solve_it_greedy(items,capacity):
+
+    print('greedy approach')
     # let's try to implement greedy algorithm first
 
     # get ordered list of items
-    capacity, items = get_weight_density(input_data)
+   # capacity, items = get_weight_density(input_data)
 
     # initialize variables:
 
@@ -139,13 +141,15 @@ def solve_it_greedy(input_data):
     return output_data
 
 
-def solve_it_dp(input_data):
+def solve_it_dp(items,capacity):
+
+    print('dynamic programming approach')
     # let's try to implement greedy algorithm first
 
     # get ordered list of items
-    capacity, items = get_weight_density(input_data)
+    #capacity, items = get_weight_density(input_data)
     #print(items)
-    value, taken_items = solve_dp(input_data)
+    value, taken_items = solve_dp(items,capacity)
     # initialize variables:
 
     taken = [0] * len(items)
@@ -161,11 +165,25 @@ def solve_it_dp(input_data):
 def solve_it(input_data):
 
     now = datetime.now()
+    items, capacity = get_weight_density(input_data)
 
+<<<<<<< HEAD
     output_data = solve_it_dp(input_data)
     later = datetime.now()
     difference = (later - now).total_seconds()
     print('time taken:', difference)
+=======
+    if len(items) <= 200:
+
+        output_data = solve_it_dp(items, capacity)
+
+    else:
+        output_data = solve_it_greedy(items, capacity)
+
+    later = datetime.now()
+    difference = (later - now).total_seconds()
+    print('time taken :', difference)
+>>>>>>> ee5a2662e01588c486f74af73231ae443542f8f2
     return output_data
 
 def naive(input_data):
@@ -213,11 +231,6 @@ if __name__ == '__main__':
         file_location = sys.argv[1].strip()
         with open(file_location, 'r') as input_data_file:
             input_data = input_data_file.read()
-        #print('naive method:')
-        #print(naive(input_data))
-        print('dynamic programming approach:')
         print(solve_it(input_data))
-        # print(get_weight_density(input_data))
     else:
-        print(
-            'This test requires an input file.  Please select one from the data directory. (i.e. python solver.py ./data/ks_4_0)')
+        print('This test requires an input file.  Please select one from the data directory. (i.e. python solver.py ./data/ks_4_0)')
