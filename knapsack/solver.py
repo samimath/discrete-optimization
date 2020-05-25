@@ -6,6 +6,7 @@ import collections
 from collections import namedtuple
 from operator import attrgetter
 import numpy as np
+from datetime import datetime
 Item = namedtuple("Item", ['index', 'value', 'weight'])
 
 Item2 = namedtuple("Item2", ['index', 'value', 'weight', 'value_density'])
@@ -158,10 +159,16 @@ def solve_it_dp(input_data):
     return output_data
 
 def solve_it(input_data):
+
+    now = datetime.now()
+
     # let's try to implement greedy algorithm first
 
     # get ordered list of items
     output_data = solve_it_dp(input_data)
+    later = datetime.now()
+    difference = (later - now).total_seconds()
+
     return output_data
 
 def naive(input_data):
