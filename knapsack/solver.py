@@ -167,6 +167,12 @@ def solve_it(input_data):
     now = datetime.now()
     items, capacity = get_weight_density(input_data)
 
+<<<<<<< HEAD
+    output_data = solve_it_dp(input_data)
+    later = datetime.now()
+    difference = (later - now).total_seconds()
+    print('time taken:', difference)
+=======
     if len(items) <= 200:
 
         output_data = solve_it_dp(items, capacity)
@@ -177,6 +183,7 @@ def solve_it(input_data):
     later = datetime.now()
     difference = (later - now).total_seconds()
     print('time taken :', difference)
+>>>>>>> ee5a2662e01588c486f74af73231ae443542f8f2
     return output_data
 
 def naive(input_data):
