@@ -1,11 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-
-import collections
 from collections import namedtuple
 from operator import attrgetter
-import numpy as np
+
 Item = namedtuple("Item", ['index', 'value', 'weight'])
 
 Item2 = namedtuple("Item2", ['index', 'value', 'weight', 'value_density'])
@@ -29,92 +27,21 @@ def get_weight_density(input_data):
     # returns list of attributes ordered by value density in descending order
     return capacity, sorted(items, key=attrgetter('value_density'), reverse=True)
 
-
-def memoization_1d(items, cap):
-    K = cap
-    D = np.empty([K + 1, len(items) + 1])
-    D[:] = np.NaN
-    w = 0
-    v = 0
-
-    for k in range(0, K + 1):
-
-        # print('**',k,':')
-
-        for j in range(0, len(items) + 1):  # in items:
-
-            if np.isnan(D[k, j]):
-                # if there is 0 capacity:
-                if (j == 0):
-                    D[:, 0] = 0
-
-                elif (items[j - 1].weight <= k):
-                    D[k, j] = max(items[j - 1].value + D[k - items[j - 1].weight, j - 1], D[k, j - 1])
-                    # if D[k,j] > D[k,j-1]:# items[j-1].value + D[k-items[j-1].weight,j-1]:
-                    # print(j)
-                else:
-                    D[k, j] = D[k, j - 1]
-            else:
-                pass
-
-    return D
+# def dynamic_search(capacity,items,j):
+#     #capacity, items = get_weight_density(input_data)
+#     #j = item.index
+#     w = items.weight
+#     k = capacity
+#     v = item.value
+#     if len(item) == 0:
+#         return 0
+#     elif w <= k
+#
+#         return max(v + dynamic_search(k - w_j, j - 1, w), O(k, j - 1, w))
 
 
-def find_next_row(r, c, items, D):
-    R = D.shape[0]
 
-    C = D.shape[0]
-    if (c < 0) or (r <= 0):
-        return
-
-    if (r == 0):
-        x = 0
-        next_col = c
-        next_row = r
-
-    # check if it's lower right corner:
-    if D[r, c] == D[r, c - 1]:
-
-        x = 0
-        next_col = c - 1
-        next_row = r
-    else:
-        #print(c, ' is selected')
-        x = 1
-        next_col = c - 1
-        next_row = r - items[c - 1].weight
-        return c - 1, find_next_row(next_row, next_col, items, D)
-
-    return find_next_row(next_row, next_col, items, D)
-
-
-def flatten(iterable):
-    results = []
-    for i in iterable:
-        if isinstance(i, collections.Iterable) and not isinstance(i, str):
-            results.extend(flatten(i))
-        else:
-            results.append(i)
-    return results
-
-
-def solve_dp(input_data):
-    cap, items = get_weight_density(input_data)
-    D = memoization_1d(items, cap)
-    #print(D)
-    #print(D[-1, -1])
-    opt_val = D[-1, -1]
-    r = D.shape[0] - 1
-    c = D.shape[1] - 1
-    #print(r)
-    #print(c)
-    #print(items)
-    selected = flatten(find_next_row(r, c, items, D))  # [0:c]
-
-    return opt_val, [x for x in selected if x is not None]
-
-
-def solve_it_greedy(input_data):
+def baseline(input_data):
     # let's try to implement greedy algorithm first
 
     # get ordered list of items
@@ -133,36 +60,35 @@ def solve_it_greedy(input_data):
             value += item.value
             weight += item.weight
 
-    output_data = str(value) + ' ' + str(0) + '\n'
-    output_data += ' '.join(map(str, taken))
-    return output_data
+        #output_data = str(value) + ' ' + str(0) + '\n'
+        #output_data += ' '.join(map(str, taken))
+    return value
 
 
-def solve_it_dp(input_data):
-    # let's try to implement greedy algorithm first
-
-    # get ordered list of items
-    capacity, items = get_weight_density(input_data)
-    #print(items)
-    value, taken_items = solve_dp(input_data)
-    # initialize variables:
-
-    taken = [0] * len(items)
-
-    for ind in taken_items:
-
-        taken[items[ind].index] = 1
-
-    output_data = str(int(value)) + ' ' + str(0) + '\n'
-    output_data += ' '.join(map(str, taken))
-    return output_data
 
 def solve_it(input_data):
     # let's try to implement greedy algorithm first
 
     # get ordered list of items
-    output_data = solve_it_dp(input_data)
+    capacity, items = get_weight_density(input_data)
+
+    # initialize variables:
+
+    value = 0
+    weight = 0
+    value_density = 0
+    taken = [0] * len(items)
+
+    for item in items:
+        if weight + item.weight <= capacity:
+            taken[item.index] = 1
+            value += item.value
+            weight += item.weight
+
+        output_data = str(value) + ' ' + str(0) + '\n'
+        output_data += ' '.join(map(str, taken))
     return output_data
+
 
 def naive(input_data):
     # Modify this code to run your optimization algorithm
@@ -192,7 +118,7 @@ def naive(input_data):
         if weight + item.weight <= capacity:
             # take item with highest value density:
             taken[item.index] = 1
-            # print(taken)
+            #print(taken)
             value += item.value
             weight += item.weight
 
@@ -211,9 +137,9 @@ if __name__ == '__main__':
             input_data = input_data_file.read()
         #print('naive method:')
         #print(naive(input_data))
-        print('dynamic programming approach:')
+        print('greedy search by sorting value density:')
         print(solve_it(input_data))
-        # print(get_weight_density(input_data))
+        #print(get_weight_density(input_data))
     else:
         print(
             'This test requires an input file.  Please select one from the data directory. (i.e. python solver.py ./data/ks_4_0)')
