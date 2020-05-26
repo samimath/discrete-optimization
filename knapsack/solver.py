@@ -7,6 +7,9 @@ from collections import namedtuple
 from operator import attrgetter
 import numpy as np
 from datetime import datetime
+from ortools.algorithms import pywrapknapsack_solver
+
+
 Item = namedtuple("Item", ['index', 'value', 'weight'])
 
 Item2 = namedtuple("Item2", ['index', 'value', 'weight', 'value_density'])
@@ -162,17 +165,46 @@ def solve_it_dp(items,capacity):
     output_data += ' '.join(map(str, taken))
     return output_data
 
+def solve_it_google(items,capacity):
+
+    values = [item.value for item in items]
+    print(values)
+    weights = [[item.weight for item in items]]
+    print(weights)
+    #capacity
+
+    solver = pywrapknapsack_solver.KnapsackSolver(
+        pywrapknapsack_solver.
+            KnapsackSolver.
+            KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER, 'KnapsackExample')
+
+    solver.Init(values, weights, [capacity])
+
+    value = solver.Solve()
+    taken_items = []
+    packed_weights = []
+    total_weight = 0
+    taken = [0] * len(items)
+    print('Total value =', value)
+    for i in range(len(values)):
+        if solver.BestSolutionContains(i):
+            taken_items.append(i)
+            packed_weights.append(weights[0][i])
+            total_weight += weights[0][i]
+    for ind in taken_items:
+
+        taken[items[ind].index] = 1
+
+    output_data = str(int(value)) + ' ' + str(0) + '\n'
+    output_data += ' '.join(map(str, taken))
+    return output_data
+
 def solve_it(input_data):
 
     now = datetime.now()
     items, capacity = get_weight_density(input_data)
 
-<<<<<<< HEAD
-    output_data = solve_it_dp(input_data)
-    later = datetime.now()
-    difference = (later - now).total_seconds()
-    print('time taken:', difference)
-=======
+
     if len(items) <= 200:
 
         output_data = solve_it_dp(items, capacity)
@@ -183,7 +215,6 @@ def solve_it(input_data):
     later = datetime.now()
     difference = (later - now).total_seconds()
     print('time taken :', difference)
->>>>>>> ee5a2662e01588c486f74af73231ae443542f8f2
     return output_data
 
 def naive(input_data):
@@ -231,6 +262,8 @@ if __name__ == '__main__':
         file_location = sys.argv[1].strip()
         with open(file_location, 'r') as input_data_file:
             input_data = input_data_file.read()
-        print(solve_it(input_data))
+        #print(solve_it(input_data))
+        items, capacity = get_weight_density(input_data)
+        print(solve_it_google(items,capacity))
     else:
         print('This test requires an input file.  Please select one from the data directory. (i.e. python solver.py ./data/ks_4_0)')
